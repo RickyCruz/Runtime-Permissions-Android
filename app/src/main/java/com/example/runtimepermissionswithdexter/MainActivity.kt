@@ -3,7 +3,9 @@ package com.example.runtimepermissionswithdexter
 import android.Manifest
 import android.app.Activity
 import android.os.Bundle
+import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.example.runtimepermissionswithdexter.enum.PermissionStatusEnum
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -17,47 +19,30 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        btnCamera.setOnClickListener {
-            checkCameraPermissions()
-        }
-
-        btnContacts.setOnClickListener {
-            checkContactsPermissions()
-        }
-
-        btnAudio.setOnClickListener {
-            checkAudioPermissions()
-        }
+        btnCamera.setOnClickListener { checkCameraPermissions() }
+        btnContacts.setOnClickListener { checkContactsPermissions() }
+        btnAudio.setOnClickListener { checkAudioPermissions() }
     }
 
-    private fun checkCameraPermissions() {
-        val context = this
+    private fun checkCameraPermissions() = setPermissionHandler(Manifest.permission.CAMERA, tvCamera)
 
-        Dexter.withContext(context)
-            .withPermission(Manifest.permission.CAMERA)
+    private fun checkContactsPermissions() = setPermissionHandler(Manifest.permission.READ_CONTACTS, tvContacts)
+
+    private fun checkAudioPermissions() = setPermissionHandler(Manifest.permission.RECORD_AUDIO, tvAudio)
+
+    private fun setPermissionHandler(permission: String, textView: TextView) {
+        Dexter.withContext(this)
+            .withPermission(permission)
             .withListener(object: PermissionListener {
                 override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                    tvCamera.text = getString(R.string.permission_status_granted)
-                    tvCamera.setTextColor(ContextCompat.getColor(context, R.color.colorPermissionStatusGranted))
+                    setPermissionStatus(textView, PermissionStatusEnum.GRANTED)
                 }
 
                 override fun onPermissionDenied(response: PermissionDeniedResponse) {
                     if (response.isPermanentlyDenied) {
-                        tvCamera.text = getString(R.string.permission_status_denied_permanently)
-                        tvCamera.setTextColor(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.colorPermissionStatusPermanentlyDenied
-                            )
-                        )
+                        setPermissionStatus(textView, PermissionStatusEnum.PERMANENTLY_DENIED)
                     } else {
-                        tvCamera.text = getString(R.string.permission_status_denied)
-                        tvCamera.setTextColor(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.colorPermissionStatusDenied
-                            )
-                        )
+                        setPermissionStatus(textView, PermissionStatusEnum.DENIED)
                     }
                 }
 
@@ -71,85 +56,22 @@ class MainActivity : Activity() {
             .check()
     }
 
-    private fun checkContactsPermissions() {
-        val context = this
+    private fun setPermissionStatus(textView: TextView, status: PermissionStatusEnum) {
+        when (status) {
+            PermissionStatusEnum.GRANTED -> {
+                textView.text = getString(R.string.permission_status_granted)
+                textView.setTextColor(ContextCompat.getColor(this, R.color.colorPermissionStatusGranted))
+            }
 
-        Dexter.withContext(context)
-            .withPermission(Manifest.permission.READ_CONTACTS)
-            .withListener(object: PermissionListener {
-                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                    tvContacts.text = getString(R.string.permission_status_granted)
-                    tvContacts.setTextColor(ContextCompat.getColor(context, R.color.colorPermissionStatusGranted))
-                }
+            PermissionStatusEnum.DENIED -> {
+                textView.text = getString(R.string.permission_status_denied)
+                textView.setTextColor(ContextCompat.getColor(this, R.color.colorPermissionStatusDenied))
+            }
 
-                override fun onPermissionDenied(response: PermissionDeniedResponse) {
-                    if (response.isPermanentlyDenied) {
-                        tvContacts.text = getString(R.string.permission_status_denied_permanently)
-                        tvContacts.setTextColor(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.colorPermissionStatusPermanentlyDenied
-                            )
-                        )
-                    } else {
-                        tvContacts.text = getString(R.string.permission_status_denied)
-                        tvContacts.setTextColor(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.colorPermissionStatusDenied
-                            )
-                        )
-                    }
-                }
-
-                override fun onPermissionRationaleShouldBeShown(
-                    permission: PermissionRequest?,
-                    token: PermissionToken
-                ) {
-                    token.continuePermissionRequest()
-                }
-            })
-            .check()
-    }
-
-    private fun checkAudioPermissions() {
-        val context = this
-
-        Dexter.withContext(context)
-            .withPermission(Manifest.permission.RECORD_AUDIO)
-            .withListener(object: PermissionListener {
-                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                    tvAudio.text = getString(R.string.permission_status_granted)
-                    tvAudio.setTextColor(ContextCompat.getColor(context, R.color.colorPermissionStatusGranted))
-                }
-
-                override fun onPermissionDenied(response: PermissionDeniedResponse) {
-                    if (response.isPermanentlyDenied) {
-                        tvAudio.text = getString(R.string.permission_status_denied_permanently)
-                        tvAudio.setTextColor(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.colorPermissionStatusPermanentlyDenied
-                            )
-                        )
-                    } else {
-                        tvAudio.text = getString(R.string.permission_status_denied)
-                        tvAudio.setTextColor(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.colorPermissionStatusDenied
-                            )
-                        )
-                    }
-                }
-
-                override fun onPermissionRationaleShouldBeShown(
-                    permission: PermissionRequest?,
-                    token: PermissionToken
-                ) {
-                    token.continuePermissionRequest()
-                }
-            })
-            .check()
+            PermissionStatusEnum.PERMANENTLY_DENIED -> {
+                textView.text = getString(R.string.permission_status_denied_permanently)
+                textView.setTextColor(ContextCompat.getColor(this, R.color.colorPermissionStatusPermanentlyDenied))
+            }
+        }
     }
 }

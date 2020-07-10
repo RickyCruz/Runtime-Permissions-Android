@@ -5,6 +5,6 @@
     <color name="colorAccent">#009688</color>
 
     <color name="colorPermissionStatusGranted">#388E3C</color>
-    <color name="colorPermissionStatusDenied">#D32F2F</color>
-    <color name="colorPermissionStatusPermanentlyDenied">#FF5722</color>
+    <color name="colorPermissionStatusDenied">#FF5722</color>
+    <color name="colorPermissionStatusPermanentlyDenied">#D32F2F</color>
 </resources>
