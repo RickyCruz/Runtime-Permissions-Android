@@ -1,7 +1,6 @@
 package com.example.runtimepermissionswithdexter
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import androidx.core.content.ContextCompat
@@ -20,6 +19,10 @@ class MainActivity : Activity() {
 
         btnCamera.setOnClickListener {
             checkCameraPermissions()
+        }
+
+        btnContacts.setOnClickListener {
+            checkContactsPermissions()
         }
     }
 
@@ -46,6 +49,47 @@ class MainActivity : Activity() {
                     } else {
                         tvCamera.text = getString(R.string.permission_status_denied)
                         tvCamera.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.colorPermissionStatusDenied
+                            )
+                        )
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permission: PermissionRequest?,
+                    token: PermissionToken
+                ) {
+                    token.continuePermissionRequest()
+                }
+            })
+            .check()
+    }
+
+    private fun checkContactsPermissions() {
+        val context = this
+
+        Dexter.withContext(context)
+            .withPermission(Manifest.permission.READ_CONTACTS)
+            .withListener(object: PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                    tvContacts.text = getString(R.string.permission_status_granted)
+                    tvContacts.setTextColor(ContextCompat.getColor(context, R.color.colorPermissionStatusGranted))
+                }
+
+                override fun onPermissionDenied(response: PermissionDeniedResponse) {
+                    if (response.isPermanentlyDenied) {
+                        tvContacts.text = getString(R.string.permission_status_denied_permanently)
+                        tvContacts.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.colorPermissionStatusPermanentlyDenied
+                            )
+                        )
+                    } else {
+                        tvContacts.text = getString(R.string.permission_status_denied)
+                        tvContacts.setTextColor(
                             ContextCompat.getColor(
                                 context,
                                 R.color.colorPermissionStatusDenied

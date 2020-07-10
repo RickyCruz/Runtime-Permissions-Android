@@ -6,5 +6,5 @@
 
     <color name="colorPermissionStatusGranted">#388E3C</color>
     <color name="colorPermissionStatusDenied">#D32F2F</color>
-    <color name="colorPermissionStatusPermanentlyDenied">#740A0A</color>
+    <color name="colorPermissionStatusPermanentlyDenied">#FF5722</color>
 </resources>
