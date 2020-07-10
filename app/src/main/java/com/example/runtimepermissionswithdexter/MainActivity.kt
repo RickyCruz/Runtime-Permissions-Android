@@ -24,6 +24,10 @@ class MainActivity : Activity() {
         btnContacts.setOnClickListener {
             checkContactsPermissions()
         }
+
+        btnAudio.setOnClickListener {
+            checkAudioPermissions()
+        }
     }
 
     private fun checkCameraPermissions() {
@@ -90,6 +94,47 @@ class MainActivity : Activity() {
                     } else {
                         tvContacts.text = getString(R.string.permission_status_denied)
                         tvContacts.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.colorPermissionStatusDenied
+                            )
+                        )
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permission: PermissionRequest?,
+                    token: PermissionToken
+                ) {
+                    token.continuePermissionRequest()
+                }
+            })
+            .check()
+    }
+
+    private fun checkAudioPermissions() {
+        val context = this
+
+        Dexter.withContext(context)
+            .withPermission(Manifest.permission.RECORD_AUDIO)
+            .withListener(object: PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                    tvAudio.text = getString(R.string.permission_status_granted)
+                    tvAudio.setTextColor(ContextCompat.getColor(context, R.color.colorPermissionStatusGranted))
+                }
+
+                override fun onPermissionDenied(response: PermissionDeniedResponse) {
+                    if (response.isPermanentlyDenied) {
+                        tvAudio.text = getString(R.string.permission_status_denied_permanently)
+                        tvAudio.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.colorPermissionStatusPermanentlyDenied
+                            )
+                        )
+                    } else {
+                        tvAudio.text = getString(R.string.permission_status_denied)
+                        tvAudio.setTextColor(
                             ContextCompat.getColor(
                                 context,
                                 R.color.colorPermissionStatusDenied
